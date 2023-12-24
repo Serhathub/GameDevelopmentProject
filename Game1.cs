@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using PlatformerDemo.Interfaces;
+using PlatformerDemo.Terrain;
+using PlatformerDemo.Terrain.PlatformerDemo.Terrain;
 
 namespace PlatformerDemo
 {
@@ -12,6 +14,9 @@ namespace PlatformerDemo
         private Player player;
         private GameState gameState;
         private Menu menu;
+        private TerrainBuilder terrainBuilder;
+        private Texture2D backgroundTextureGame;
+
 
         public Game1()
         {
@@ -24,6 +29,7 @@ namespace PlatformerDemo
 
         protected override void Initialize()
         {
+            // TODO: Add your initialization logic here
             base.Initialize();
         }
 
@@ -31,22 +37,23 @@ namespace PlatformerDemo
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            //Load background image
+            // Load background image
             Texture2D backgroundTexture = Content.Load<Texture2D>("Sample");
+
+            backgroundTextureGame = Content.Load<Texture2D>("Background/background");
 
             // Load button images
             Texture2D startButtonTexture = Content.Load<Texture2D>("Menu/playbutton");
             Texture2D exitButtonTexture = Content.Load<Texture2D>("Menu/backbutton");
 
-
             // Load your texture arrays for idle, move, and jump frames
-            Texture2D[] idleFrames = new Texture2D[] { Content.Load<Texture2D>("Player/tile_0040") };
-            Texture2D[] moveFrames = new Texture2D[] { Content.Load<Texture2D>("Player/tile_0040"), Content.Load<Texture2D>("Player/tile_0041"), Content.Load<Texture2D>("Player/tile_0042") };
-            Texture2D[] jumpFrames = new Texture2D[] { Content.Load<Texture2D>("Player/tile_0045"), Content.Load<Texture2D>("Player/tile_0046") };
+            Texture2D[] idleFrames = { Content.Load<Texture2D>("Player/tile_0040") };
+            Texture2D[] moveFrames = { Content.Load<Texture2D>("Player/tile_0040"), Content.Load<Texture2D>("Player/tile_0041") };
+            Texture2D[] jumpFrames = { Content.Load<Texture2D>("Player/tile_0045"), Content.Load<Texture2D>("Player/tile_0046") };
 
             // Create the player instance
             player = new Player(new Vector2(100, 100), idleFrames, moveFrames, jumpFrames);
-            
+
             // Set the initial game state
             gameState = GameState.Menu;
 
@@ -55,6 +62,14 @@ namespace PlatformerDemo
 
             // Create the menu instance
             menu = new Menu(font, GraphicsDevice, backgroundTexture, startButtonTexture, exitButtonTexture);
+
+            // Initialize Terrain
+            IBlueprint blueprint = new Blueprint();
+            terrainBuilder = new TerrainBuilder(blueprint);
+
+            // Load terrain texture (assuming a single texture for all tiles)
+            Texture2D terrainTexture = Content.Load<Texture2D>("Tiles/tilemap");
+            terrainBuilder.LoadTerrain(terrainTexture);
         }
 
         protected override void Update(GameTime gameTime)
@@ -65,25 +80,19 @@ namespace PlatformerDemo
             switch (gameState)
             {
                 case GameState.Menu:
-                    // Update menu
                     menu.Update(gameTime);
-
-                    // Check for menu interactions (e.g., selecting "Start")
-                    if (menuIsStartSelected())  // Add a method to check if "Start" is selected
+                    if (menu.SelectedOption == "Start")
                     {
                         gameState = GameState.Playing;
                     }
-                    else if(IsExitSelected())
+                    else if (menu.SelectedOption == "Exit")
                     {
                         Exit();
                     }
-
                     break;
 
                 case GameState.Playing:
-                    // Update player
-                    player.Update(gameTime);
-
+                    player.Update(gameTime, terrainBuilder.Blocks); // Pass in the blocks for collision
                     break;
             }
 
@@ -92,22 +101,23 @@ namespace PlatformerDemo
 
         protected override void Draw(GameTime gameTime)
         {
+            float scale = 2.0f;
+            
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            float scale = 2f;
 
             _spriteBatch.Begin();
+
+            _spriteBatch.Draw(backgroundTextureGame, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
 
             switch (gameState)
             {
                 case GameState.Menu:
                     menu.Draw(_spriteBatch);
-
                     break;
 
                 case GameState.Playing:
-                    // Draw the player using the loaded sprite sheet and updated position
+                    terrainBuilder.DrawTerrain(_spriteBatch);
                     _spriteBatch.Draw(player.CurrentFrameTexture, player.Position, null, Color.White, 0f, Vector2.Zero, scale, player.IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
-
                     break;
             }
 
@@ -115,20 +125,5 @@ namespace PlatformerDemo
 
             base.Draw(gameTime);
         }
-
-        private bool menuIsStartSelected()
-        {
-            return menu.SelectedOption == "Start";
-        }
-        private bool IsExitSelected()
-        {
-            return menu.SelectedOption == "Exit";
-        }
-
-
     }
 }
-
-
-
-

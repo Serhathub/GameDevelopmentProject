@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PlatformerDemo.Terrain.Blocks;
+using System.Collections.Generic;
 
 namespace PlatformerDemo
 {
@@ -11,34 +13,31 @@ namespace PlatformerDemo
 
         private Vector2 position;
         private Vector2 velocity;
+        private bool isOnGround;
+
         private float jumpVelocity = -8f; // Adjust the initial jump velocity
-        private float gravity = 0.4f; // Adjust gravity as needed
-        private bool isOnGround = true; // Flag to track whether the player is on the ground
+        private float gravity = 0.35f; // Adjust gravity as needed
 
         public Vector2 Position
         {
             get { return position; }
             set { position = value; }
         }
-        private bool isFacingLeft = false;
 
-        public bool IsFacingLeft
-        {
-            get { return isFacingLeft; }
-            set { isFacingLeft = value; }
-        }
-
-        public bool IsJumping { get; set; }
+        public bool IsFacingLeft { get; set; }
+        public bool IsJumping { get; private set; }
+        public Rectangle BoundingBox => new Rectangle((int)Position.X, (int)Position.Y, CurrentFrameTexture.Width, CurrentFrameTexture.Height);
 
         public Player(Vector2 initialPosition, Texture2D[] idleFrames, Texture2D[] moveFrames, Texture2D[] jumpFrames)
         {
-            Position = initialPosition;
+            position = initialPosition;
             idleAnimation = new Animation(idleFrames, 0.1f);
             moveAnimation = new Animation(moveFrames, 0.1f);
             jumpAnimation = new Animation(jumpFrames, 0.1f);
+            isOnGround = false;
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, List<Block> blocks)
         {
             Vector2 movement = InputManager.UpdatePlayerMovement();
 
@@ -48,41 +47,8 @@ namespace PlatformerDemo
                 position.X += movement.X * 3f; // Adjust movement speed as needed
 
                 // Determine the animation based on movement direction
-                if (movement.X > 0)
-                {
-                    IsFacingLeft = false;
-                }
-                else
-                {
-                    IsFacingLeft = true;
-                }
-
+                IsFacingLeft = movement.X < 0;
                 moveAnimation.Update(gameTime);
-            }
-            else if (IsJumping)
-            {
-                // Player is jumping
-                jumpAnimation.Update(gameTime);
-
-                // Allow small adjustments to the player's position while jumping
-                position.X += movement.X * 1.5f; // Adjust the factor as needed
-
-                // Update player position based on vertical velocity
-                position.Y += velocity.Y;
-
-                // Apply gravity to simulate falling
-                velocity.Y += gravity; // Adjust gravity as needed
-
-                // Check if the player has landed (reached the ground)
-                if (position.Y >= 100) // Adjust the ground level as needed
-                {
-                    // Reset jumping state
-                    IsJumping = false;
-                    isOnGround = true; // Set the flag to true when the player lands
-                    position.Y = 100; // Adjust the ground level as needed
-                    velocity.Y = 0;
-                    jumpAnimation.Reset(); // Reset the jump animation to the beginning
-                }
             }
             else
             {
@@ -90,9 +56,55 @@ namespace PlatformerDemo
                 idleAnimation.Update(gameTime);
             }
 
+            // Handle jumping
+            if (IsJumping)
+            {
+                // Allow small adjustments to the player's position while jumping
+                position.X += movement.X * 1.5f; // Adjust the factor as needed
+                jumpAnimation.Update(gameTime);
+            }
+
+            // Apply gravity
+            if (!isOnGround)
+            {
+                velocity.Y += gravity;
+                position.Y += velocity.Y;
+            }
+
+            // Check for collisions
+            isOnGround = false; // Assume player is not on the ground until we find a collision
+            foreach (var block in blocks)
+            {
+                if (BoundingBox.Intersects(block.BoundingBox))
+                {
+                    HandleCollisionWithBlock(block);
+                }
+            }
+
+            // If no collision and player is not jumping, player should be falling
+            if (!isOnGround && !IsJumping)
+            {
+                IsJumping = true;
+            }
+
+            // Jump logic
             if (InputManager.IsJumpKeyPressed() && isOnGround)
             {
                 Jump();
+            }
+        }
+
+        private void HandleCollisionWithBlock(Block block)
+        {
+            // Calculate how much we need to move the player up to prevent overlapping.
+            // This is a very simplistic collision response for the top of the blocks only.
+            Rectangle blockBox = block.BoundingBox;
+            if (velocity.Y > 0 && Position.Y + CurrentFrameTexture.Height <= blockBox.Top + velocity.Y)
+            {
+                Position = new Vector2(Position.X, blockBox.Top - CurrentFrameTexture.Height);
+                velocity.Y = 0;
+                isOnGround = true;
+                IsJumping = false;
             }
         }
 
@@ -117,20 +129,12 @@ namespace PlatformerDemo
 
         private void Jump()
         {
-            IsJumping = true;
-            isOnGround = false; // Set the flag to false when the player jumps
-            // Set an initial vertical velocity for the jump
-            velocity.Y = jumpVelocity;
+            if (isOnGround)
+            {
+                IsJumping = true;
+                isOnGround = false;
+                velocity.Y = jumpVelocity;
+            }
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
