@@ -18,13 +18,22 @@ namespace PlatformerDemo.Terrain.Blocks
             Position = new Vector2(x * 16, y * 16);
             Texture = texture;
             SpriteFrame = spriteFrame;
-            BoundingBox = new Rectangle(x * 32, y * 32, 32, 32); // 32 because the blocks are scaled by 2
+            BoundingBox = new Rectangle(x * 16, y * 16, 16, 16); // 32 because the blocks are scaled by 2
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position, SpriteFrame, Color, 0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Texture, Position, SpriteFrame, Color, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
         }
+
+        public void DrawBoundingBox(SpriteBatch spriteBatch)
+        {
+            Texture2D rectTexture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            rectTexture.SetData(new[] { Color.Blue });
+
+            spriteBatch.Draw(rectTexture, BoundingBox, Color.White * 0.5f); // Semi-transparent blue box
+        }
+
     }
 
     public class PlatformBlock1 : Block

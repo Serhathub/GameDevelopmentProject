@@ -100,9 +100,7 @@ namespace PlatformerDemo
         }
 
         protected override void Draw(GameTime gameTime)
-        {
-            float scale = 2.0f;
-            
+        {            
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
@@ -117,7 +115,8 @@ namespace PlatformerDemo
 
                 case GameState.Playing:
                     terrainBuilder.DrawTerrain(_spriteBatch);
-                    _spriteBatch.Draw(player.CurrentFrameTexture, player.Position, null, Color.White, 0f, Vector2.Zero, scale, player.IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(player.CurrentFrameTexture, player.Position, null, Color.White, 0f, Vector2.Zero, 1.0f, player.IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
+                    player.DrawBoundingBox(_spriteBatch);
                     break;
             }
 

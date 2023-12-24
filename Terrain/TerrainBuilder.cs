@@ -48,6 +48,7 @@ namespace PlatformerDemo.Terrain
             foreach (var block in Blocks)
             {
                 block.Draw(spriteBatch);
+                block.DrawBoundingBox(spriteBatch);
             }
         }
     }

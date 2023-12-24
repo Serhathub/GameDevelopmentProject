@@ -14,6 +14,7 @@ namespace PlatformerDemo
         private Vector2 position;
         private Vector2 velocity;
         private bool isOnGround;
+        private bool isMoving;
 
         private float jumpVelocity = -8f; // Adjust the initial jump velocity
         private float gravity = 0.35f; // Adjust gravity as needed
@@ -35,44 +36,31 @@ namespace PlatformerDemo
             moveAnimation = new Animation(moveFrames, 0.1f);
             jumpAnimation = new Animation(jumpFrames, 0.1f);
             isOnGround = false;
+            isMoving = false;
         }
 
         public void Update(GameTime gameTime, List<Block> blocks)
         {
             Vector2 movement = InputManager.UpdatePlayerMovement();
+            isMoving = movement.X != 0;
 
-            if (movement.X != 0)
-            {
-                // Player is moving
-                position.X += movement.X * 3f; // Adjust movement speed as needed
+            Vector2 newPosition = position + new Vector2(movement.X * 3f, 0);
+            Rectangle newHorizontalBounds = new Rectangle((int)newPosition.X, (int)position.Y, BoundingBox.Width, BoundingBox.Height);
+            bool horizontalCollision = CheckForBlockCollision(newHorizontalBounds, blocks);
 
-                // Determine the animation based on movement direction
-                IsFacingLeft = movement.X < 0;
-                moveAnimation.Update(gameTime);
-            }
-            else
+            if (isMoving && !horizontalCollision)
             {
-                // Player is idle
-                idleAnimation.Update(gameTime);
+                HandleHorizontalMovement(movement, blocks, gameTime);
             }
 
-            // Handle jumping
-            if (IsJumping)
-            {
-                // Allow small adjustments to the player's position while jumping
-                position.X += movement.X * 1.5f; // Adjust the factor as needed
-                jumpAnimation.Update(gameTime);
-            }
-
-            // Apply gravity
             if (!isOnGround)
             {
                 velocity.Y += gravity;
                 position.Y += velocity.Y;
+                isOnGround = false; // Reset to false before collision check
             }
 
-            // Check for collisions
-            isOnGround = false; // Assume player is not on the ground until we find a collision
+            isOnGround = false;
             foreach (var block in blocks)
             {
                 if (BoundingBox.Intersects(block.BoundingBox))
@@ -81,31 +69,67 @@ namespace PlatformerDemo
                 }
             }
 
-            // If no collision and player is not jumping, player should be falling
-            if (!isOnGround && !IsJumping)
+
+            if (IsJumping)
             {
-                IsJumping = true;
+                jumpAnimation.Update(gameTime);
+            }
+            else if (isOnGround)
+            {
+                if (isMoving)
+                {
+                    moveAnimation.Update(gameTime);
+                }
+                else
+                {
+                    idleAnimation.Update(gameTime);
+                }
             }
 
-            // Jump logic
             if (InputManager.IsJumpKeyPressed() && isOnGround)
             {
                 Jump();
             }
+
         }
 
         private void HandleCollisionWithBlock(Block block)
         {
-            // Calculate how much we need to move the player up to prevent overlapping.
-            // This is a very simplistic collision response for the top of the blocks only.
             Rectangle blockBox = block.BoundingBox;
-            if (velocity.Y > 0 && Position.Y + CurrentFrameTexture.Height <= blockBox.Top + velocity.Y)
+            if (velocity.Y >= 0 && Position.Y + CurrentFrameTexture.Height <= blockBox.Top + velocity.Y + 1)
             {
                 Position = new Vector2(Position.X, blockBox.Top - CurrentFrameTexture.Height);
                 velocity.Y = 0;
                 isOnGround = true;
                 IsJumping = false;
             }
+        }
+
+        private void HandleHorizontalMovement(Vector2 movement, List<Block> blocks, GameTime gameTime)
+        {
+            float moveAmount = movement.X * 3f;
+            Vector2 newPosition = position + new Vector2(moveAmount, 0);
+            Rectangle newHorizontalBounds = new Rectangle((int)newPosition.X, (int)position.Y, BoundingBox.Width, BoundingBox.Height);
+
+            if (!CheckForBlockCollision(newHorizontalBounds, blocks))
+            {
+                position.X += moveAmount; // Adjust movement speed as needed
+                IsFacingLeft = movement.X < 0;
+                moveAnimation.Update(gameTime);
+            }
+        }
+
+
+        private bool CheckForBlockCollision(Rectangle boundingBox, List<Block> blocks)
+        {
+            foreach (var block in blocks)
+            {
+                if (boundingBox.Intersects(block.BoundingBox))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public Texture2D CurrentFrameTexture
@@ -116,7 +140,7 @@ namespace PlatformerDemo
                 {
                     return jumpAnimation.CurrentFrameTexture;
                 }
-                else if (InputManager.UpdatePlayerMovement().X != 0)
+                else if (isMoving)
                 {
                     return moveAnimation.CurrentFrameTexture;
                 }
@@ -127,6 +151,7 @@ namespace PlatformerDemo
             }
         }
 
+
         private void Jump()
         {
             if (isOnGround)
@@ -135,6 +160,15 @@ namespace PlatformerDemo
                 isOnGround = false;
                 velocity.Y = jumpVelocity;
             }
+        }
+
+        public void DrawBoundingBox(SpriteBatch spriteBatch)
+        {
+            Rectangle box = BoundingBox;
+            Texture2D rectTexture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            rectTexture.SetData(new[] { Color.Red });
+
+            spriteBatch.Draw(rectTexture, box, Color.White * 0.5f); // Semi-transparent red box
         }
     }
 }
