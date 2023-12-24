@@ -11,11 +11,11 @@ namespace PlatformerDemo
             Vector2 movement = Vector2.Zero;
 
             // Example: Check for player movement
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
             {
                 movement.X = 1;
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            else if (Keyboard.GetState().IsKeyDown(Keys.Left) || Keyboard.GetState().IsKeyDown(Keys.A))
             {
                 movement.X = -1;
             }

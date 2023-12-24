@@ -116,7 +116,7 @@ namespace PlatformerDemo
                 case GameState.Playing:
                     terrainBuilder.DrawTerrain(_spriteBatch);
                     _spriteBatch.Draw(player.CurrentFrameTexture, player.Position, null, Color.White, 0f, Vector2.Zero, 1.0f, player.IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
-                    player.DrawBoundingBox(_spriteBatch);
+                    //player.DrawBoundingBox(_spriteBatch);
                     break;
             }
 

@@ -16,7 +16,7 @@ namespace PlatformerDemo
         private bool isOnGround;
         private bool isMoving;
 
-        private float jumpVelocity = -8f; // Adjust the initial jump velocity
+        private float jumpVelocity = -6.5f; // Adjust the initial jump velocity
         private float gravity = 0.35f; // Adjust gravity as needed
 
         public Vector2 Position
