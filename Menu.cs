@@ -58,5 +58,11 @@ namespace PlatformerDemo
             spriteBatch.Draw(startButtonTexture, startOptionPosition, null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0f);
             spriteBatch.Draw(exitButtonTexture, exitOptionPosition, null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0f);
         }
+
+        public void ResetSelectedOption()
+        {
+            SelectedOption = null; // Or whatever the default state should be
+        }
+
     }
 }

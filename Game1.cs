@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PlatformerDemo.Interfaces;
 using PlatformerDemo.Terrain;
-using PlatformerDemo.Terrain.PlatformerDemo.Terrain;
+using System.Collections.Generic;
 
 namespace PlatformerDemo
 {
@@ -14,9 +14,12 @@ namespace PlatformerDemo
         private Player player;
         private GameState gameState;
         private Menu menu;
-        private TerrainBuilder terrainBuilder;
+        private Level currentLevel;
+        private Texture2D backgroundTextureMenu;
         private Texture2D backgroundTextureGame;
-
+        private Texture2D heartTexture;
+        private HealthBar healthBar;
+        private GameOverScreen gameOverScreen;
 
         public Game1()
         {
@@ -29,7 +32,6 @@ namespace PlatformerDemo
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             base.Initialize();
         }
 
@@ -37,16 +39,15 @@ namespace PlatformerDemo
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Load background image
-            Texture2D backgroundTexture = Content.Load<Texture2D>("Sample");
-
+            // Load background images
+            backgroundTextureMenu = Content.Load<Texture2D>("Sample");
             backgroundTextureGame = Content.Load<Texture2D>("Background/background");
 
             // Load button images
             Texture2D startButtonTexture = Content.Load<Texture2D>("Menu/playbutton");
             Texture2D exitButtonTexture = Content.Load<Texture2D>("Menu/backbutton");
 
-            // Load your texture arrays for idle, move, and jump frames
+            // Load player textures
             Texture2D[] idleFrames = { Content.Load<Texture2D>("Player/tile_0040") };
             Texture2D[] moveFrames = { Content.Load<Texture2D>("Player/tile_0040"), Content.Load<Texture2D>("Player/tile_0041") };
             Texture2D[] jumpFrames = { Content.Load<Texture2D>("Player/tile_0045"), Content.Load<Texture2D>("Player/tile_0046") };
@@ -60,16 +61,16 @@ namespace PlatformerDemo
             // Load font for the menu
             SpriteFont font = Content.Load<SpriteFont>("MenuFont");
 
-            // Create the menu instance
-            menu = new Menu(font, GraphicsDevice, backgroundTexture, startButtonTexture, exitButtonTexture);
+            // Create the menu and game over instances
+            menu = new Menu(font, GraphicsDevice, backgroundTextureMenu, startButtonTexture, exitButtonTexture);
+            gameOverScreen = new GameOverScreen(Content, GraphicsDevice);
 
-            // Initialize Terrain
-            IBlueprint blueprint = new Blueprint();
-            terrainBuilder = new TerrainBuilder(blueprint);
+            // Load heart texture and create health bar
+            heartTexture = Content.Load<Texture2D>("Menu/heart");
+            healthBar = new HealthBar(heartTexture, new Vector2(10, 10));
 
-            // Load terrain texture (assuming a single texture for all tiles)
-            Texture2D terrainTexture = Content.Load<Texture2D>("Tiles/tilemap");
-            terrainBuilder.LoadTerrain(terrainTexture);
+            // Initialize the first level
+            currentLevel = new Level(GraphicsDevice, Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -92,31 +93,69 @@ namespace PlatformerDemo
                     break;
 
                 case GameState.Playing:
-                    player.Update(gameTime, terrainBuilder.Blocks); // Pass in the blocks for collision
+                    player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies);
+                    currentLevel.Update(gameTime);
+
+                    if ((player.IsOffScreen(_graphics.PreferredBackBufferHeight) || player.Lives <= 0) && gameState != GameState.GameOver)
+                    {
+                        gameState = GameState.GameOver;
+                    }
+                    break;
+
+                case GameState.GameOver:
+                    if (gameOverScreen.Update(gameTime))
+                    {
+                        ResetGame();
+                        gameState = GameState.MenuTransition; // Add an intermediate state for transition
+                    }
+                    break;
+
+                case GameState.MenuTransition:
+                    // Check for key release before showing the menu
+                    if (!Keyboard.GetState().IsKeyDown(Keys.Enter))
+                    {
+                        gameState = GameState.Menu;
+                    }
                     break;
             }
 
             base.Update(gameTime);
         }
 
+        private void ResetGame()
+        {
+            // Reset player state
+            player.ResetPlayer(new Vector2(100, 100), 3); // Assuming this method resets the player's position and lives
+
+            // Reset the menu's selected option
+            menu.ResetSelectedOption(); // You'll need to add this method in the Menu class
+
+            // Any other game elements that need to be reset
+        }
+
+
         protected override void Draw(GameTime gameTime)
-        {            
+        {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(backgroundTextureGame, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
-
             switch (gameState)
             {
                 case GameState.Menu:
+                    _spriteBatch.Draw(backgroundTextureMenu, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
                     menu.Draw(_spriteBatch);
                     break;
 
                 case GameState.Playing:
-                    terrainBuilder.DrawTerrain(_spriteBatch);
-                    _spriteBatch.Draw(player.CurrentFrameTexture, player.Position, null, Color.White, 0f, Vector2.Zero, 1.0f, player.IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
-                    //player.DrawBoundingBox(_spriteBatch);
+                    _spriteBatch.Draw(backgroundTextureGame, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
+                    currentLevel.Draw(_spriteBatch);
+                    player.Draw(_spriteBatch);
+                    healthBar.Draw(_spriteBatch, player.Lives);
+                    break;
+
+                case GameState.GameOver:
+                    gameOverScreen.Draw(_spriteBatch);
                     break;
             }
 

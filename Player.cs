@@ -15,6 +15,13 @@ namespace PlatformerDemo
         private Vector2 velocity;
         private bool isOnGround;
         private bool isMoving;
+        public int Lives { get; set; }
+
+        // Flickering effect variables
+        private bool isFlickering;
+        private float flickerDuration = 1f; // Duration in seconds
+        private float flickerTimer;
+        private float flickerInterval = 0.1f; // Interval of flicker effect
 
         private float jumpVelocity = -6.5f; // Adjust the initial jump velocity
         private float gravity = 0.35f; // Adjust gravity as needed
@@ -37,9 +44,10 @@ namespace PlatformerDemo
             jumpAnimation = new Animation(jumpFrames, 0.1f);
             isOnGround = false;
             isMoving = false;
+            Lives = 3; // Player starts with 3 lives
         }
 
-        public void Update(GameTime gameTime, List<Block> blocks)
+        public void Update(GameTime gameTime, List<Block> blocks, List<Enemy> enemies)
         {
             Vector2 movement = InputManager.UpdatePlayerMovement();
             isMoving = movement.X != 0;
@@ -69,7 +77,6 @@ namespace PlatformerDemo
                 }
             }
 
-
             if (IsJumping)
             {
                 jumpAnimation.Update(gameTime);
@@ -91,6 +98,70 @@ namespace PlatformerDemo
                 Jump();
             }
 
+            foreach (var enemy in enemies)
+            {
+                if (IsJumpingOnEnemy(enemy))
+                {
+                    enemy.IsActive = false; // Deactivate the enemy
+                }
+                else if (enemy.IsActive && BoundingBox.Intersects(enemy.BoundingBox))
+                {
+                    LoseLife();
+                }
+            }
+
+            // Flickering logic
+            if (isFlickering)
+            {
+                flickerTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (flickerTimer >= flickerDuration)
+                {
+                    isFlickering = false;
+                    flickerTimer = 0;
+                }
+            }
+        }
+
+        private void LoseLife()
+        {
+            Lives--;
+            isFlickering = true;
+            flickerTimer = 0;
+
+            if (Lives <= 0)
+            {
+                // TODO: Handle game over logic
+            }
+            else
+            {
+                // TODO: Reset player to a safe position
+            }
+        }
+
+        public bool IsOffScreen(int screenHeight)
+        {
+            return Position.Y > screenHeight; // Assuming Y increases downwards
+        }
+
+        private bool IsJumpingOnEnemy(Enemy enemy)
+        {
+            if (!enemy.IsActive) return false;
+
+            // Check if the player's bottom is colliding with the top of the enemy
+            return BoundingBox.Top < enemy.BoundingBox.Bottom &&
+                   BoundingBox.Bottom > enemy.BoundingBox.Top &&
+                   BoundingBox.Right > enemy.BoundingBox.Left &&
+                   BoundingBox.Left < enemy.BoundingBox.Right &&
+                   velocity.Y > 0; // Ensure the player is falling down
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            // Skip drawing the player on every other flicker interval if flickering
+            if (!isFlickering || (isFlickering && flickerTimer % (flickerInterval * 2) < flickerInterval))
+            {
+                spriteBatch.Draw(CurrentFrameTexture, Position, null, Color.White, 0f, Vector2.Zero, 1.0f, IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
+            }
         }
 
         private void HandleCollisionWithBlock(Block block)
@@ -119,7 +190,6 @@ namespace PlatformerDemo
             }
         }
 
-
         private bool CheckForBlockCollision(Rectangle boundingBox, List<Block> blocks)
         {
             foreach (var block in blocks)
@@ -130,6 +200,13 @@ namespace PlatformerDemo
                 }
             }
             return false;
+        }
+
+        public void ResetPlayer(Vector2 newPosition, int newLives)
+        {
+            Position = newPosition;
+            Lives = newLives;
+            // Any other reset logic, like resetting animation states
         }
 
         public Texture2D CurrentFrameTexture
@@ -151,7 +228,6 @@ namespace PlatformerDemo
             }
         }
 
-
         private void Jump()
         {
             if (isOnGround)
@@ -160,15 +236,6 @@ namespace PlatformerDemo
                 isOnGround = false;
                 velocity.Y = jumpVelocity;
             }
-        }
-
-        public void DrawBoundingBox(SpriteBatch spriteBatch)
-        {
-            Rectangle box = BoundingBox;
-            Texture2D rectTexture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
-            rectTexture.SetData(new[] { Color.Red });
-
-            spriteBatch.Draw(rectTexture, box, Color.White * 0.5f); // Semi-transparent red box
         }
     }
 }

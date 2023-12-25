@@ -9,6 +9,10 @@ namespace PlatformerDemo
     public enum GameState
     {
         Menu,
-        Playing
+        Playing,
+        GameOver,
+        MenuTransition // New state for handling transition
     }
+
+
 }
