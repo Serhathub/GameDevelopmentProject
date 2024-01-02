@@ -15,8 +15,8 @@ namespace PlatformerDemo
         public GameOverScreen(ContentManager content, GraphicsDevice graphicsDevice)
         {
             font = content.Load<SpriteFont>("MenuFont"); // Load your font
-            gameOverMessage = "Game Over";
-            returnMessage = "Press Enter to restart";
+            gameOverMessage = "Game Over!";
+            returnMessage = "Press 'Enter' to restart";
 
             // Calculate positions to center the text
             Vector2 gameOverSize = font.MeasureString(gameOverMessage);

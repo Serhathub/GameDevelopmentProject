@@ -19,6 +19,12 @@ namespace PlatformerDemo
             {
                 movement.X = -1;
             }
+            if (Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
+            {
+                // Crouch behavior
+                // Adjust player's size or trigger crouch animation, etc.
+                // You may want to set a flag indicating that the player is crouching
+            }
 
             return movement;
         }
@@ -26,7 +32,7 @@ namespace PlatformerDemo
         public static bool IsJumpKeyPressed()
         {
             // Example: Check for jumping
-            return Keyboard.GetState().IsKeyDown(Keys.Space);
+            return Keyboard.GetState().IsKeyDown(Keys.Up);
         }
 
         public static bool IsMovingLeft()

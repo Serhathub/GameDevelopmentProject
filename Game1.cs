@@ -96,7 +96,19 @@ namespace PlatformerDemo
                     player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies);
                     currentLevel.Update(gameTime);
 
+                    if (player.Position.X > _graphics.PreferredBackBufferWidth)
+                    {
+                        gameState = GameState.GameOver;
+                    }
+
+
                     if ((player.IsOffScreen(_graphics.PreferredBackBufferHeight) || player.Lives <= 0) && gameState != GameState.GameOver)
+                    {
+                        player.ResetPlayer(new Vector2(100, 100), player.Lives - 1);
+                    }
+                    
+
+                    if (player.Lives <= 0)
                     {
                         gameState = GameState.GameOver;
                     }
@@ -126,7 +138,11 @@ namespace PlatformerDemo
         {
             // Reset player state
             player.ResetPlayer(new Vector2(100, 100), 3); // Assuming this method resets the player's position and lives
-
+            foreach (var enemy in currentLevel.Enemies)
+            {
+                enemy.Reset();
+                enemy.IsActive = true;
+            }
             // Reset the menu's selected option
             menu.ResetSelectedOption(); // You'll need to add this method in the Menu class
 

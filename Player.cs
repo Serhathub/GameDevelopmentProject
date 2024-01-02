@@ -23,6 +23,7 @@ namespace PlatformerDemo
         private float flickerTimer;
         private float flickerInterval = 0.1f; // Interval of flicker effect
 
+
         private float jumpVelocity = -6.5f; // Adjust the initial jump velocity
         private float gravity = 0.35f; // Adjust gravity as needed
 
@@ -135,9 +136,19 @@ namespace PlatformerDemo
             else
             {
                 // TODO: Reset player to a safe position
+                Respawn();
+                
             }
         }
 
+        private void Respawn()
+        {
+            Vector2 respawnPosition = new Vector2(100, 100);
+
+            this.ResetPlayer(respawnPosition, Lives);
+            isFlickering = true;
+            flickerTimer = 0;
+        }
         public bool IsOffScreen(int screenHeight)
         {
             return Position.Y > screenHeight; // Assuming Y increases downwards

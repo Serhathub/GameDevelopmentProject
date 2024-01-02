@@ -16,8 +16,11 @@ namespace PlatformerDemo
         private Texture2D enemyTexture;
         private Texture2D enemyTexture3;
         private Texture2D terrainTexture;
+        private GraphicsDevice graphicsDevice;
+        private Player player;
 
         public List<Block> TerrainBlocks => terrainBuilder.Blocks;
+        public bool IsLevelComplete { get; private set; }
 
         public Level(GraphicsDevice graphicsDevice, ContentManager content)
         {
@@ -36,15 +39,23 @@ namespace PlatformerDemo
             float movementRange = 2 * 16; // Adjust as needed
             Enemies.Add(new Enemy(enemyTexture, new Vector2(350, 150), 2f, movementRange, Enemy.MoveLeftRight));
             Enemies.Add(new Enemy(enemyTexture3, new Vector2(530, 145), 2f, movementRange, Enemy.MoveLeftRight));
+            Enemies.Add(new Enemy(enemyTexture3, new Vector2(250, 50), 2f, movementRange, Enemy.MoveLeftRight));
             // Add more enemies as needed
+
+            IsLevelComplete = false;
         }
 
         public void Update(GameTime gameTime)
         {
+            if (player !=null && player.Position.X > graphicsDevice.Viewport.Width)
+            {
+                IsLevelComplete = true;
+            }
             foreach (var enemy in Enemies)
             {
                 enemy.Update(gameTime);
             }
+            
         }
 
         public void Draw(SpriteBatch spriteBatch)

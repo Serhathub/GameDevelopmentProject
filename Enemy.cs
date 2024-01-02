@@ -9,6 +9,7 @@ namespace PlatformerDemo
         public Vector2 Position { get; private set; }
         public Texture2D Texture { get; private set; }
         public bool IsActive { get; set; }
+        public bool IsOnTheGround { get; set; }
         public Rectangle BoundingBox => new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
         private float movementSpeed;
@@ -56,6 +57,14 @@ namespace PlatformerDemo
                 enemy.direction *= -1; // Change direction
                 enemy.Position += enemy.direction * enemy.movementSpeed; // Adjust position to stay within range
             }
+        }
+       
+
+
+
+        public void Reset()
+        {
+            Position = originalPosition;
         }
 
         // Other behaviors...
