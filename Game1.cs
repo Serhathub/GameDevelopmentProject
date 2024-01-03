@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PlatformerDemo.Entities;
 using PlatformerDemo.Interfaces;
-using PlatformerDemo.Terrain;
-using System.Collections.Generic;
-
+using PlatformerDemo.Levels;
+using PlatformerDemo.States;
 namespace PlatformerDemo
 {
     public class Game1 : Game
@@ -14,12 +14,14 @@ namespace PlatformerDemo
         private Player player;
         private GameState gameState;
         private Menu menu;
-        private Level currentLevel;
+        private ILevel currentLevel;
         private Texture2D backgroundTextureMenu;
         private Texture2D backgroundTextureGame;
         private Texture2D heartTexture;
         private HealthBar healthBar;
         private GameOverScreen gameOverScreen;
+        private VictoryScreen victoryScreen;
+        private bool isSecondLevel;
 
         public Game1()
         {
@@ -57,12 +59,13 @@ namespace PlatformerDemo
 
             menu = new Menu(font, GraphicsDevice, backgroundTextureMenu, startButtonTexture, exitButtonTexture);
             gameOverScreen = new GameOverScreen(Content, GraphicsDevice);
+            victoryScreen = new VictoryScreen(Content, GraphicsDevice);
 
             heartTexture = Content.Load<Texture2D>("Menu/heart");
             healthBar = new HealthBar(heartTexture, new Vector2(10, 10));
 
-            
             currentLevel = new Level(GraphicsDevice, Content);
+            isSecondLevel = false;
         }
 
         protected override void Update(GameTime gameTime)
@@ -88,17 +91,22 @@ namespace PlatformerDemo
                     player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies);
                     currentLevel.Update(gameTime);
 
-                    if (player.Position.X > _graphics.PreferredBackBufferWidth)
+                    if (player.Position.X >= _graphics.PreferredBackBufferWidth - player.BoundingBox.Width)
                     {
-                        gameState = GameState.GameOver;
+                        if (isSecondLevel)
+                        {
+                            gameState = GameState.VictoryScreen;
+                        }
+                        else
+                        {
+                            TransitionToNextLevel();
+                        }
                     }
-
 
                     if ((player.IsOffScreen(_graphics.PreferredBackBufferHeight) || player.Lives <= 0) && gameState != GameState.GameOver)
                     {
                         player.ResetPlayer(new Vector2(100, 100), player.Lives - 1);
                     }
-                    
 
                     if (player.Lives <= 0)
                     {
@@ -106,11 +114,19 @@ namespace PlatformerDemo
                     }
                     break;
 
+                case GameState.VictoryScreen:
+                    if (gameOverScreen.Update(gameTime))
+                    {
+                        ResetGame();
+                        gameState = GameState.MenuTransition;
+                    }
+                    break;
+
                 case GameState.GameOver:
                     if (gameOverScreen.Update(gameTime))
                     {
                         ResetGame();
-                        gameState = GameState.MenuTransition; 
+                        gameState = GameState.MenuTransition;
                     }
                     break;
 
@@ -125,19 +141,25 @@ namespace PlatformerDemo
             base.Update(gameTime);
         }
 
+        private void TransitionToNextLevel()
+        {
+            currentLevel = new Level2(GraphicsDevice, Content);
+            player.ResetPlayer(new Vector2(0, 100), 3);
+            isSecondLevel = true;
+        }
+
         private void ResetGame()
         {
-            
             player.ResetPlayer(new Vector2(100, 100), 3);
             foreach (var enemy in currentLevel.Enemies)
             {
                 enemy.Reset();
                 enemy.IsActive = true;
             }
-            
             menu.ResetSelectedOption();
+            currentLevel = new Level(GraphicsDevice, Content);
+            isSecondLevel = false;
         }
-
 
         protected override void Draw(GameTime gameTime)
         {
@@ -157,6 +179,10 @@ namespace PlatformerDemo
                     currentLevel.Draw(_spriteBatch);
                     player.Draw(_spriteBatch);
                     healthBar.Draw(_spriteBatch, player.Lives);
+                    break;
+
+                case GameState.VictoryScreen:
+                    victoryScreen.Draw(_spriteBatch);
                     break;
 
                 case GameState.GameOver:

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 
 
-namespace PlatformerDemo
+namespace PlatformerDemo.Input
 {
     public static class InputManager
     {
@@ -10,7 +10,7 @@ namespace PlatformerDemo
         {
             Vector2 movement = Vector2.Zero;
 
-            
+
             if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
             {
                 movement.X = 1;
@@ -29,14 +29,14 @@ namespace PlatformerDemo
 
         public static bool IsJumpKeyPressed()
         {
-            
-            return Keyboard.GetState().IsKeyDown(Keys.Up);
+            var keyboardState = Keyboard.GetState();
+            return keyboardState.IsKeyDown(Keys.Space) || keyboardState.IsKeyDown(Keys.Up);
         }
 
         public static bool IsMovingLeft()
         {
-            
-            return Keyboard.GetState().IsKeyDown(Keys.Left);
+            var keyboardState = Keyboard.GetState();
+            return keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A);
         }
     }
 }

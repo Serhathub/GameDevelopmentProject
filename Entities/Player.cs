@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PlatformerDemo.Animations;
+using PlatformerDemo.Input;
 using PlatformerDemo.Terrain.Blocks;
 using System.Collections.Generic;
 
-namespace PlatformerDemo
+namespace PlatformerDemo.Entities
 {
     public class Player
     {
@@ -17,15 +19,15 @@ namespace PlatformerDemo
         private bool isMoving;
         public int Lives { get; set; }
 
-        
+
         private bool isFlickering;
-        private float flickerDuration = 1f; 
+        private float flickerDuration = 1f;
         private float flickerTimer;
-        private float flickerInterval = 0.1f; 
+        private float flickerInterval = 0.1f;
 
 
-        private float jumpVelocity = -6.5f; 
-        private float gravity = 0.35f; 
+        private float jumpVelocity = -6.5f;
+        private float gravity = 0.35f;
 
         public Vector2 Position
         {
@@ -45,7 +47,7 @@ namespace PlatformerDemo
             jumpAnimation = new Animation(jumpFrames, 0.1f);
             isOnGround = false;
             isMoving = false;
-            Lives = 3; 
+            Lives = 3;
         }
 
         public void Update(GameTime gameTime, List<Block> blocks, List<Enemy> enemies)
@@ -66,7 +68,7 @@ namespace PlatformerDemo
             {
                 velocity.Y += gravity;
                 position.Y += velocity.Y;
-                isOnGround = false; 
+                isOnGround = false;
             }
 
             isOnGround = false;
@@ -103,7 +105,7 @@ namespace PlatformerDemo
             {
                 if (IsJumpingOnEnemy(enemy))
                 {
-                    enemy.IsActive = false; 
+                    enemy.IsActive = false;
                 }
                 else if (enemy.IsActive && BoundingBox.Intersects(enemy.BoundingBox))
                 {
@@ -111,7 +113,7 @@ namespace PlatformerDemo
                 }
             }
 
-            
+
             if (isFlickering)
             {
                 flickerTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -131,13 +133,13 @@ namespace PlatformerDemo
 
             if (Lives <= 0)
             {
-                
+
             }
             else
             {
-                
+
                 Respawn();
-                
+
             }
         }
 
@@ -145,30 +147,30 @@ namespace PlatformerDemo
         {
             Vector2 respawnPosition = new Vector2(100, 100);
 
-            this.ResetPlayer(respawnPosition, Lives);
+            ResetPlayer(respawnPosition, Lives);
             isFlickering = true;
             flickerTimer = 0;
         }
         public bool IsOffScreen(int screenHeight)
         {
-            return Position.Y > screenHeight; 
+            return Position.Y > screenHeight;
         }
 
         private bool IsJumpingOnEnemy(Enemy enemy)
         {
             if (!enemy.IsActive) return false;
-            
+
             return BoundingBox.Top < enemy.BoundingBox.Bottom &&
                    BoundingBox.Bottom > enemy.BoundingBox.Top &&
                    BoundingBox.Right > enemy.BoundingBox.Left &&
                    BoundingBox.Left < enemy.BoundingBox.Right &&
-                   velocity.Y > 0; 
+                   velocity.Y > 0;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            
-            if (!isFlickering || (isFlickering && flickerTimer % (flickerInterval * 2) < flickerInterval))
+
+            if (!isFlickering || isFlickering && flickerTimer % (flickerInterval * 2) < flickerInterval)
             {
                 spriteBatch.Draw(CurrentFrameTexture, Position, null, Color.White, 0f, Vector2.Zero, 1.0f, IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
             }
@@ -194,7 +196,7 @@ namespace PlatformerDemo
 
             if (!CheckForBlockCollision(newHorizontalBounds, blocks))
             {
-                position.X += moveAmount; 
+                position.X += moveAmount;
                 IsFacingLeft = movement.X < 0;
                 moveAnimation.Update(gameTime);
             }
@@ -216,7 +218,7 @@ namespace PlatformerDemo
         {
             Position = newPosition;
             Lives = newLives;
-            
+
         }
 
         public Texture2D CurrentFrameTexture

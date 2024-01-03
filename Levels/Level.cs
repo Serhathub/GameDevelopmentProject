@@ -6,10 +6,11 @@ using PlatformerDemo.Terrain.PlatformerDemo.Terrain;
 using PlatformerDemo.Terrain;
 using System.Collections.Generic;
 using PlatformerDemo.Terrain.Blocks;
+using PlatformerDemo.Entities;
 
-namespace PlatformerDemo
+namespace PlatformerDemo.Levels
 {
-    public class Level
+    public class Level : ILevel
     {
         public List<Enemy> Enemies { get; private set; }
         private TerrainBuilder terrainBuilder;
@@ -25,7 +26,7 @@ namespace PlatformerDemo
 
         public Level(GraphicsDevice graphicsDevice, ContentManager content)
         {
-            
+
             IBlueprint blueprint = new Blueprint();
             terrainBuilder = new TerrainBuilder(blueprint);
             terrainTexture = content.Load<Texture2D>("Tiles/tilemap");
@@ -35,20 +36,20 @@ namespace PlatformerDemo
             enemyTexture2 = content.Load<Texture2D>("Enemies/tile_0055");
             enemyTexture3 = content.Load<Texture2D>("Enemies/tile_0051");
 
-            
+
             Enemies = new List<Enemy>();
-            float movementRange = 2 * 16; 
-            Enemies.Add(new Enemy(enemyTexture, new Vector2(350, 150), 2f, movementRange, Enemy.MoveLeftRight));
-            Enemies.Add(new Enemy(enemyTexture2, new Vector2(530, 145), 2f, movementRange, Enemy.MoveLeftRight));
+            float movementRange = 2 * 16;
+            Enemies.Add(new Enemy(enemyTexture, new Vector2(350, 140), 2f, movementRange, Enemy.MoveInCircle));
+            Enemies.Add(new Enemy(enemyTexture2, new Vector2(530, 145), 1f, movementRange, Enemy.MoveLeftRight));
             Enemies.Add(new Enemy(enemyTexture3, new Vector2(250, 70), 2f, movementRange, Enemy.JumpAndFall));
-            
+
 
             IsLevelComplete = false;
         }
 
         public void Update(GameTime gameTime)
         {
-            if (player !=null && player.Position.X > graphicsDevice.Viewport.Width)
+            if (player != null && player.Position.X > graphicsDevice.Viewport.Width)
             {
                 IsLevelComplete = true;
             }
@@ -56,7 +57,7 @@ namespace PlatformerDemo
             {
                 enemy.Update(gameTime);
             }
-            
+
         }
 
         public void Draw(SpriteBatch spriteBatch)

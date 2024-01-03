@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlatformerDemo
+namespace PlatformerDemo.States
 {
     public enum GameState
     {
         Menu,
         Playing,
         GameOver,
-        MenuTransition // New state for handling transition
+        MenuTransition,
+        VictoryScreen
     }
 
 

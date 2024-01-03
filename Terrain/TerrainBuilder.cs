@@ -34,9 +34,7 @@ namespace PlatformerDemo.Terrain
                         case 3:
                             Blocks.Add(new PlatformBlock3(j, i, texture));
                             break;
-                        // Add cases for other block types
                         default:
-                            // Handle the default case or do nothing
                             break;
                     }
                 }
@@ -48,7 +46,6 @@ namespace PlatformerDemo.Terrain
             foreach (var block in Blocks)
             {
                 block.Draw(spriteBatch);
-                //block.DrawBoundingBox(spriteBatch);
             }
         }
     }

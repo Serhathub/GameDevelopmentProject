@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace PlatformerDemo
+namespace PlatformerDemo.Animations
 {
     public class Animation
     {

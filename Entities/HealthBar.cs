@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace PlatformerDemo
+namespace PlatformerDemo.Entities
 {
     public class HealthBar
     {
@@ -15,7 +15,7 @@ namespace PlatformerDemo
             this.heartTexture = heartTexture;
             this.position = position;
             this.scale = scale;
-            heartSize = (int)(heartTexture.Width * scale); // Scale the heart size
+            heartSize = (int)(heartTexture.Width * scale);
         }
 
         public void Draw(SpriteBatch spriteBatch, int lives)

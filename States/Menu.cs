@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace PlatformerDemo
+namespace PlatformerDemo.States
 {
     public class Menu
     {
@@ -23,25 +23,25 @@ namespace PlatformerDemo
             this.startButtonTexture = startButtonTexture;
             this.exitButtonTexture = exitButtonTexture;
 
-            
-            float buttonScale = 0.5f; 
+
+            float buttonScale = 0.5f;
             startOptionPosition = new Vector2(graphicsDevice.Viewport.Width / 2 - startButtonTexture.Width * buttonScale / 2, graphicsDevice.Viewport.Height / 2 - startButtonTexture.Height * buttonScale / 2);
             exitOptionPosition = new Vector2(graphicsDevice.Viewport.Width / 2 - exitButtonTexture.Width * buttonScale / 2, graphicsDevice.Viewport.Height / 2 + startButtonTexture.Height * buttonScale);
         }
 
         public void Update(GameTime gameTime)
         {
-          
+
             MouseState mouseState = Mouse.GetState();
 
-            
+
             Rectangle startButtonRectangle = new Rectangle((int)startOptionPosition.X, (int)startOptionPosition.Y, 100, 20);
             if (startButtonRectangle.Contains(mouseState.Position) && mouseState.LeftButton == ButtonState.Pressed)
             {
                 SelectedOption = "Start";
             }
 
-            
+
             Rectangle exitButtonRectangle = new Rectangle((int)exitOptionPosition.X, (int)exitOptionPosition.Y, 100, 20);
             if (exitButtonRectangle.Contains(mouseState.Position) && mouseState.LeftButton == ButtonState.Pressed)
             {
@@ -51,7 +51,7 @@ namespace PlatformerDemo
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            
+
             spriteBatch.Draw(backgroundTexture, Vector2.Zero, Color.White);
 
             spriteBatch.Draw(startButtonTexture, startOptionPosition, null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0f);
@@ -60,7 +60,7 @@ namespace PlatformerDemo
 
         public void ResetSelectedOption()
         {
-            SelectedOption = null; 
+            SelectedOption = null;
         }
 
     }
