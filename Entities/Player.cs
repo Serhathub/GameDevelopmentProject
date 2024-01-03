@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using PlatformerDemo.Animations;
 using PlatformerDemo.Input;
 using PlatformerDemo.Terrain.Blocks;
@@ -17,6 +18,7 @@ namespace PlatformerDemo.Entities
         private Vector2 velocity;
         private bool isOnGround;
         private bool isMoving;
+        public bool IsCrouching { get; private set; }
         public int Lives { get; set; }
 
 
@@ -54,6 +56,7 @@ namespace PlatformerDemo.Entities
         {
             Vector2 movement = InputManager.UpdatePlayerMovement();
             isMoving = movement.X != 0;
+            IsCrouching = Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S);
 
             Vector2 newPosition = position + new Vector2(movement.X * 3f, 0);
             Rectangle newHorizontalBounds = new Rectangle((int)newPosition.X, (int)position.Y, BoundingBox.Width, BoundingBox.Height);
@@ -160,21 +163,43 @@ namespace PlatformerDemo.Entities
         {
             if (!enemy.IsActive) return false;
 
-            return BoundingBox.Top < enemy.BoundingBox.Bottom &&
-                   BoundingBox.Bottom > enemy.BoundingBox.Top &&
-                   BoundingBox.Right > enemy.BoundingBox.Left &&
-                   BoundingBox.Left < enemy.BoundingBox.Right &&
-                   velocity.Y > 0;
+            bool isJumpingOnEnemy = BoundingBox.Top < enemy.BoundingBox.Bottom &&
+                                    BoundingBox.Bottom > enemy.BoundingBox.Top &&
+                                    BoundingBox.Right > enemy.BoundingBox.Left &&
+                                    BoundingBox.Left < enemy.BoundingBox.Right &&
+                                    velocity.Y > 0;
+
+            if (isJumpingOnEnemy)
+            {
+                velocity.Y = -6f;
+            }
+
+            return isJumpingOnEnemy;
         }
+
 
         public void Draw(SpriteBatch spriteBatch)
         {
-
-            if (!isFlickering || isFlickering && flickerTimer % (flickerInterval * 2) < flickerInterval)
+            if (!isFlickering || (isFlickering && flickerTimer % (flickerInterval * 2) < flickerInterval))
             {
-                spriteBatch.Draw(CurrentFrameTexture, Position, null, Color.White, 0f, Vector2.Zero, 1.0f, IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
+                float scale = 1.0f;
+                Vector2 positionAdjustment = Vector2.Zero;
+
+                if (IsCrouching)
+                {
+                    scale = 0.5f;
+
+                    float heightDifference = CurrentFrameTexture.Height * (1 - scale);
+
+                    positionAdjustment.Y = heightDifference;
+                }
+
+                Vector2 adjustedPosition = Position + positionAdjustment;
+                spriteBatch.Draw(CurrentFrameTexture, adjustedPosition, null, Color.White, 0f, Vector2.Zero, new Vector2(1.0f, scale), IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
             }
         }
+
+
 
         private void HandleCollisionWithBlock(Block block)
         {
