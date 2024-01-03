@@ -15,10 +15,10 @@ namespace PlatformerDemo
         private float movementSpeed;
         private Action<Enemy, GameTime> behavior;
         private Vector2 direction = Vector2.UnitX;
-        private Random random = new Random();
+        
 
         private Vector2 originalPosition;
-        private float movementRange; // The range in which the enemy moves
+        private float movementRange; 
 
         public Enemy(Texture2D texture, Vector2 initialPosition, float speed, float moveRange, Action<Enemy, GameTime> behaviorFunc)
         {
@@ -46,19 +46,44 @@ namespace PlatformerDemo
             }
         }
 
-        // Modified behavior: move left and right within a range
         public static void MoveLeftRight(Enemy enemy, GameTime gameTime)
         {
             enemy.Position += enemy.direction * enemy.movementSpeed;
 
-            // Check if the enemy is outside its movement range
+            
             if (Math.Abs(enemy.Position.X - enemy.originalPosition.X) > enemy.movementRange)
             {
-                enemy.direction *= -1; // Change direction
-                enemy.Position += enemy.direction * enemy.movementSpeed; // Adjust position to stay within range
+                enemy.direction *= -1; 
+                enemy.Position += enemy.direction * enemy.movementSpeed; 
             }
         }
-       
+
+        public static void JumpAndFall(Enemy enemy, GameTime gameTime)
+        {
+            const float jumpSpeed = -300f;  
+            const float gravity = 800f;   
+
+            if (enemy.IsOnTheGround)
+            {
+                
+                enemy.direction.Y = jumpSpeed;
+                enemy.IsOnTheGround = false;
+            }
+
+            
+            float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            enemy.direction.Y += gravity * elapsedSeconds;
+
+            
+            enemy.Position += enemy.direction * elapsedSeconds;
+
+            
+            if (enemy.Position.Y >= enemy.originalPosition.Y)
+            {
+                enemy.Position = new Vector2(enemy.Position.X, enemy.originalPosition.Y);
+                enemy.IsOnTheGround = true;
+            }
+        }
 
 
 
@@ -67,6 +92,6 @@ namespace PlatformerDemo
             Position = originalPosition;
         }
 
-        // Other behaviors...
+        
     }
 }

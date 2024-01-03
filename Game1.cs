@@ -39,37 +39,29 @@ namespace PlatformerDemo
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Load background images
             backgroundTextureMenu = Content.Load<Texture2D>("Sample");
             backgroundTextureGame = Content.Load<Texture2D>("Background/background");
 
-            // Load button images
             Texture2D startButtonTexture = Content.Load<Texture2D>("Menu/playbutton");
             Texture2D exitButtonTexture = Content.Load<Texture2D>("Menu/backbutton");
 
-            // Load player textures
             Texture2D[] idleFrames = { Content.Load<Texture2D>("Player/tile_0040") };
             Texture2D[] moveFrames = { Content.Load<Texture2D>("Player/tile_0040"), Content.Load<Texture2D>("Player/tile_0041") };
             Texture2D[] jumpFrames = { Content.Load<Texture2D>("Player/tile_0045"), Content.Load<Texture2D>("Player/tile_0046") };
 
-            // Create the player instance
             player = new Player(new Vector2(100, 100), idleFrames, moveFrames, jumpFrames);
 
-            // Set the initial game state
             gameState = GameState.Menu;
 
-            // Load font for the menu
             SpriteFont font = Content.Load<SpriteFont>("MenuFont");
 
-            // Create the menu and game over instances
             menu = new Menu(font, GraphicsDevice, backgroundTextureMenu, startButtonTexture, exitButtonTexture);
             gameOverScreen = new GameOverScreen(Content, GraphicsDevice);
 
-            // Load heart texture and create health bar
             heartTexture = Content.Load<Texture2D>("Menu/heart");
             healthBar = new HealthBar(heartTexture, new Vector2(10, 10));
 
-            // Initialize the first level
+            
             currentLevel = new Level(GraphicsDevice, Content);
         }
 
@@ -118,12 +110,11 @@ namespace PlatformerDemo
                     if (gameOverScreen.Update(gameTime))
                     {
                         ResetGame();
-                        gameState = GameState.MenuTransition; // Add an intermediate state for transition
+                        gameState = GameState.MenuTransition; 
                     }
                     break;
 
                 case GameState.MenuTransition:
-                    // Check for key release before showing the menu
                     if (!Keyboard.GetState().IsKeyDown(Keys.Enter))
                     {
                         gameState = GameState.Menu;
@@ -136,17 +127,15 @@ namespace PlatformerDemo
 
         private void ResetGame()
         {
-            // Reset player state
-            player.ResetPlayer(new Vector2(100, 100), 3); // Assuming this method resets the player's position and lives
+            
+            player.ResetPlayer(new Vector2(100, 100), 3);
             foreach (var enemy in currentLevel.Enemies)
             {
                 enemy.Reset();
                 enemy.IsActive = true;
             }
-            // Reset the menu's selected option
-            menu.ResetSelectedOption(); // You'll need to add this method in the Menu class
-
-            // Any other game elements that need to be reset
+            
+            menu.ResetSelectedOption();
         }
 
 

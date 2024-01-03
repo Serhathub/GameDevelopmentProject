@@ -18,7 +18,7 @@ namespace PlatformerDemo.Terrain.Blocks
             Position = new Vector2(x * 16, y * 16);
             Texture = texture;
             SpriteFrame = spriteFrame;
-            BoundingBox = new Rectangle(x * 16, y * 16, 16, 16); // 32 because the blocks are scaled by 2
+            BoundingBox = new Rectangle(x * 16, y * 16, 16, 16); 
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
@@ -31,7 +31,7 @@ namespace PlatformerDemo.Terrain.Blocks
             Texture2D rectTexture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
             rectTexture.SetData(new[] { Color.Blue });
 
-            spriteBatch.Draw(rectTexture, BoundingBox, Color.White * 0.5f); // Semi-transparent blue box
+            spriteBatch.Draw(rectTexture, BoundingBox, Color.White * 0.5f);
         }
 
     }
@@ -39,7 +39,7 @@ namespace PlatformerDemo.Terrain.Blocks
     public class PlatformBlock1 : Block
     {
         public PlatformBlock1(int x, int y, Texture2D texture)
-            : base(x, y, texture, new Rectangle(0, 32, 16, 16)) // Use the correct coordinates for this block type
+            : base(x, y, texture, new Rectangle(0, 32, 16, 16)) 
         {
         }
     }
@@ -47,7 +47,7 @@ namespace PlatformerDemo.Terrain.Blocks
     public class PlatformBlock2 : Block
     {
         public PlatformBlock2(int x, int y, Texture2D texture)
-            : base(x, y, texture, new Rectangle(16, 32, 16, 16)) // Adjust coordinates as needed
+            : base(x, y, texture, new Rectangle(16, 32, 16, 16)) 
         {
         }
     }
@@ -55,15 +55,15 @@ namespace PlatformerDemo.Terrain.Blocks
     public class PlatformBlock3 : Block
     {
         public PlatformBlock3(int x, int y, Texture2D texture)
-            : base(x, y, texture, new Rectangle(32, 32, 16, 16)) // Adjust coordinates as needed
+            : base(x, y, texture, new Rectangle(32, 32, 16, 16)) 
         {
         }
     }
-
+    
     public class ExitBlock : Block
     {
         public ExitBlock(int x, int y, Texture2D texture)
-            : base(x, y, texture, new Rectangle(48, 32, 16, 16)) // Adjust coordinates as needed
+            : base(x, y, texture, new Rectangle(48, 32, 16, 16)) 
         {
         }
     }

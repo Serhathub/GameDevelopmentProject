@@ -14,6 +14,7 @@ namespace PlatformerDemo
         public List<Enemy> Enemies { get; private set; }
         private TerrainBuilder terrainBuilder;
         private Texture2D enemyTexture;
+        private Texture2D enemyTexture2;
         private Texture2D enemyTexture3;
         private Texture2D terrainTexture;
         private GraphicsDevice graphicsDevice;
@@ -24,23 +25,23 @@ namespace PlatformerDemo
 
         public Level(GraphicsDevice graphicsDevice, ContentManager content)
         {
-            // Initialize Terrain
+            
             IBlueprint blueprint = new Blueprint();
             terrainBuilder = new TerrainBuilder(blueprint);
             terrainTexture = content.Load<Texture2D>("Tiles/tilemap");
             terrainBuilder.LoadTerrain(terrainTexture);
 
-            // Load enemy texture
             enemyTexture = content.Load<Texture2D>("Enemies/tile_0053");
-            enemyTexture3 = content.Load<Texture2D>("Enemies/tile_0055");
+            enemyTexture2 = content.Load<Texture2D>("Enemies/tile_0055");
+            enemyTexture3 = content.Load<Texture2D>("Enemies/tile_0051");
 
-            // Initialize enemies
+            
             Enemies = new List<Enemy>();
-            float movementRange = 2 * 16; // Adjust as needed
+            float movementRange = 2 * 16; 
             Enemies.Add(new Enemy(enemyTexture, new Vector2(350, 150), 2f, movementRange, Enemy.MoveLeftRight));
-            Enemies.Add(new Enemy(enemyTexture3, new Vector2(530, 145), 2f, movementRange, Enemy.MoveLeftRight));
-            Enemies.Add(new Enemy(enemyTexture3, new Vector2(250, 50), 2f, movementRange, Enemy.MoveLeftRight));
-            // Add more enemies as needed
+            Enemies.Add(new Enemy(enemyTexture2, new Vector2(530, 145), 2f, movementRange, Enemy.MoveLeftRight));
+            Enemies.Add(new Enemy(enemyTexture3, new Vector2(250, 70), 2f, movementRange, Enemy.JumpAndFall));
+            
 
             IsLevelComplete = false;
         }

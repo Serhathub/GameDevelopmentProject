@@ -6,11 +6,11 @@ namespace PlatformerDemo
 {
     public static class InputManager
     {
-        public static Vector2 UpdatePlayerMovement()
+        public static Vector2 UpdatePlayerMovement(bool allowPassThrough = false)
         {
             Vector2 movement = Vector2.Zero;
 
-            // Example: Check for player movement
+            
             if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
             {
                 movement.X = 1;
@@ -19,11 +19,9 @@ namespace PlatformerDemo
             {
                 movement.X = -1;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
+            if (allowPassThrough && Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
             {
-                // Crouch behavior
-                // Adjust player's size or trigger crouch animation, etc.
-                // You may want to set a flag indicating that the player is crouching
+                // Crouch 
             }
 
             return movement;
@@ -31,13 +29,13 @@ namespace PlatformerDemo
 
         public static bool IsJumpKeyPressed()
         {
-            // Example: Check for jumping
+            
             return Keyboard.GetState().IsKeyDown(Keys.Up);
         }
 
         public static bool IsMovingLeft()
         {
-            // Example: Check if the player is moving left
+            
             return Keyboard.GetState().IsKeyDown(Keys.Left);
         }
     }
