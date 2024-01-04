@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 using PlatformerDemo.Entities;
 using PlatformerDemo.Interfaces;
 using PlatformerDemo.Levels;
@@ -22,7 +24,8 @@ namespace PlatformerDemo
         private GameOverScreen gameOverScreen;
         private VictoryScreen victoryScreen;
         private bool isSecondLevel;
-
+        Song backgroundMusic;
+        SoundEffect jumpSound;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -43,6 +46,12 @@ namespace PlatformerDemo
 
             backgroundTextureMenu = Content.Load<Texture2D>("Sample");
             backgroundTextureGame = Content.Load<Texture2D>("Background/background");
+            backgroundMusic = Content.Load<Song>("Music/theme");
+            jumpSound = Content.Load<SoundEffect>("Music/jump");
+
+            MediaPlayer.Play(backgroundMusic);
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Volume = 0.3f;
 
             Texture2D startButtonTexture = Content.Load<Texture2D>("Menu/playbutton");
             Texture2D exitButtonTexture = Content.Load<Texture2D>("Menu/backbutton");
@@ -88,7 +97,7 @@ namespace PlatformerDemo
                     break;
 
                 case GameState.Playing:
-                    player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies);
+                    player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies,jumpSound);
                     currentLevel.Update(gameTime);
 
                     if (player.Position.X >= _graphics.PreferredBackBufferWidth - player.BoundingBox.Width)

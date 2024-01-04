@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PlatformerDemo.Animations;
@@ -52,7 +53,7 @@ namespace PlatformerDemo.Entities
             Lives = 3;
         }
 
-        public void Update(GameTime gameTime, List<Block> blocks, List<Enemy> enemies)
+        public void Update(GameTime gameTime, List<Block> blocks, List<Enemy> enemies, SoundEffect jumpSound)
         {
             Vector2 movement = InputManager.UpdatePlayerMovement();
             isMoving = movement.X != 0;
@@ -102,6 +103,7 @@ namespace PlatformerDemo.Entities
             if (InputManager.IsJumpKeyPressed() && isOnGround)
             {
                 Jump();
+                jumpSound.Play();
             }
 
             foreach (var enemy in enemies)

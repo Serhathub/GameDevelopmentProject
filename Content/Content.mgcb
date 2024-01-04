@@ -116,6 +116,18 @@
 /processorParam:TextureFormat=Compressed
 /build:Menufont.spritefont
 
+#begin Music/jump.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Music/jump.wav
+
+#begin Music/theme.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/theme.mp3
+
 #begin Player/tile_0040.png
 /importer:TextureImporter
 /processor:TextureProcessor
