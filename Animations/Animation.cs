@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PlatformerDemo.Animations
 {
+    // OCP - Open/Closed Principle
+    // De Animation klasse is open voor uitbreiding (je kunt meer animaties toevoegen) maar gesloten voor wijziging (de bestaande logica blijft intact).
     public class Animation
     {
         private Texture2D[] frames;

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 namespace PlatformerDemo.Terrain
 {
+    // Builder Pattern
+    // De TerrainBuilder klasse omvat de constructie van een complex terrein, waarbij de representatie en de constructie van elkaar worden gescheiden.
     public class TerrainBuilder
     {
         private IBlueprint blueprint;

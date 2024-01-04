@@ -16,10 +16,10 @@ namespace PlatformerDemo.Entities
         private Action<Enemy, GameTime> behavior;
         private Vector2 direction = Vector2.UnitX;
 
-
         private Vector2 originalPosition;
         private float movementRange;
-
+        // Strategy Pattern
+        // Het gedrag van een vijand wordt tijdens runtime bepaald, waardoor het flexibel kan worden beheerd.
         public Enemy(Texture2D texture, Vector2 initialPosition, float speed, float moveRange, Action<Enemy, GameTime> behaviorFunc)
         {
             Texture = texture;

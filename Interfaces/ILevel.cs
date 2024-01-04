@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 namespace PlatformerDemo.Interfaces
 {
+    // ISP - Interface Segregation Principle
+    // De interface is specifiek, en zorgt ervoor dat implementerende klassen zoals Level niet wordt belast met onnodige methoden.
     public interface ILevel
     {
         List<Enemy> Enemies { get; }

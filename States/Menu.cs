@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace PlatformerDemo.States
 {
+
+    //SRP - Deze klasse is enkel gericht op menu-interacties
     public class Menu
     {
         private SpriteFont font;

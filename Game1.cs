@@ -9,6 +9,8 @@ using PlatformerDemo.Levels;
 using PlatformerDemo.States;
 namespace PlatformerDemo
 {
+    //LSP - Liskov Substitution Principle (LSP):
+    //Level en Level2 kunnen door elkaar worden gebruikt waar ILevel wordt verwacht, in overeenstemming met LSP.
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -16,7 +18,7 @@ namespace PlatformerDemo
         private Player player;
         private GameState gameState;
         private Menu menu;
-        private ILevel currentLevel;
+        private ILevel currentLevel; //LSP
         private Texture2D backgroundTextureMenu;
         private Texture2D backgroundTextureGame;
         private Texture2D heartTexture;
@@ -73,7 +75,7 @@ namespace PlatformerDemo
             heartTexture = Content.Load<Texture2D>("Menu/heart");
             healthBar = new HealthBar(heartTexture, new Vector2(10, 10));
 
-            currentLevel = new Level(GraphicsDevice, Content);
+            currentLevel = new Level(GraphicsDevice, Content); //LSP
             isSecondLevel = false;
         }
 
@@ -97,7 +99,7 @@ namespace PlatformerDemo
                     break;
 
                 case GameState.Playing:
-                    player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies,jumpSound);
+                    player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies, jumpSound);
                     currentLevel.Update(gameTime);
 
                     if (player.Position.X >= _graphics.PreferredBackBufferWidth - player.BoundingBox.Width)

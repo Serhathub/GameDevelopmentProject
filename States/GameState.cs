@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace PlatformerDemo.States
 {
+    // State Pattern
+    // Het gedrag van het spel verandert op basis van de interne staat (gameState), wat het State Pattern demonstreert.
     public enum GameState
     {
         Menu,
@@ -14,6 +16,4 @@ namespace PlatformerDemo.States
         MenuTransition,
         VictoryScreen
     }
-
-
 }
