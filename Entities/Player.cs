@@ -53,7 +53,7 @@ namespace PlatformerDemo.Entities
             Lives = 3;
         }
 
-        public void Update(GameTime gameTime, List<Block> blocks, List<Enemy> enemies, SoundEffect jumpSound)
+        public void Update(GameTime gameTime, List<Block> blocks, List<Enemy> enemies)
         {
             Vector2 movement = InputManager.UpdatePlayerMovement();
             isMoving = movement.X != 0;
@@ -103,7 +103,7 @@ namespace PlatformerDemo.Entities
             if (InputManager.IsJumpKeyPressed() && isOnGround)
             {
                 Jump();
-                jumpSound.Play();
+                AudioManager.Instance.PlayJumpSound();
             }
 
             foreach (var enemy in enemies)

@@ -1,16 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
 using PlatformerDemo.Entities;
 using PlatformerDemo.Interfaces;
 using PlatformerDemo.Levels;
 using PlatformerDemo.States;
+
 namespace PlatformerDemo
 {
-    //LSP - Liskov Substitution Principle (LSP):
-    //Level en Level2 kunnen door elkaar worden gebruikt waar ILevel wordt verwacht, in overeenstemming met LSP.
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -18,7 +15,7 @@ namespace PlatformerDemo
         private Player player;
         private GameState gameState;
         private Menu menu;
-        private ILevel currentLevel; //LSP
+        private ILevel currentLevel;
         private Texture2D backgroundTextureMenu;
         private Texture2D backgroundTextureGame;
         private Texture2D heartTexture;
@@ -26,8 +23,7 @@ namespace PlatformerDemo
         private GameOverScreen gameOverScreen;
         private VictoryScreen victoryScreen;
         private bool isSecondLevel;
-        Song backgroundMusic;
-        SoundEffect jumpSound;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -48,12 +44,9 @@ namespace PlatformerDemo
 
             backgroundTextureMenu = Content.Load<Texture2D>("Sample");
             backgroundTextureGame = Content.Load<Texture2D>("Background/background");
-            backgroundMusic = Content.Load<Song>("Music/theme");
-            jumpSound = Content.Load<SoundEffect>("Music/jump");
 
-            MediaPlayer.Play(backgroundMusic);
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Volume = 0.3f;
+            AudioManager.Instance.LoadContent(Content);
+            AudioManager.Instance.PlayBackgroundMusic();
 
             Texture2D startButtonTexture = Content.Load<Texture2D>("Menu/playbutton");
             Texture2D exitButtonTexture = Content.Load<Texture2D>("Menu/backbutton");
@@ -75,7 +68,7 @@ namespace PlatformerDemo
             heartTexture = Content.Load<Texture2D>("Menu/heart");
             healthBar = new HealthBar(heartTexture, new Vector2(10, 10));
 
-            currentLevel = new Level(GraphicsDevice, Content); //LSP
+            currentLevel = new Level(GraphicsDevice, Content);
             isSecondLevel = false;
         }
 
@@ -99,7 +92,7 @@ namespace PlatformerDemo
                     break;
 
                 case GameState.Playing:
-                    player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies, jumpSound);
+                    player.Update(gameTime, currentLevel.TerrainBlocks, currentLevel.Enemies);
                     currentLevel.Update(gameTime);
 
                     if (player.Position.X >= _graphics.PreferredBackBufferWidth - player.BoundingBox.Width)
@@ -126,7 +119,7 @@ namespace PlatformerDemo
                     break;
 
                 case GameState.VictoryScreen:
-                    if (gameOverScreen.Update(gameTime))
+                    if (victoryScreen.Update(gameTime))
                     {
                         ResetGame();
                         gameState = GameState.MenuTransition;
